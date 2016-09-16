@@ -1,2 +1,1 @@
-# SAS-Snippets
-my SAS snippets for daily use
+# SAS-Snippets for daily use
