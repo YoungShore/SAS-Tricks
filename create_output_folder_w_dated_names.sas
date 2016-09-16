@@ -19,6 +19,7 @@ X "EXIT";
 ODS LISTING;
 
 /* if you want to set a particular date as the name of the folder */
+
 %macro mkdir(dir=);
 * CREATE WORK DIRECTORY FOR OUTPUT IF IT DOES NOT EXIST;
 %if %sysfunc(fileexist(&OUTFOLDER)) ^= 1 %then %do;
@@ -28,4 +29,5 @@ libname out "&outfolder.";
 %else %put &OUTFOLDER. already exits;
 %mend mkdir;
 %mkdir(dir=&OUTFOLDER);
+
 /* in above which the {options dlcreatedir; libname out "&outfolder.";} is the trick, it creates the folder */
