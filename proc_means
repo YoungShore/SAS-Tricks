@@ -1,0 +1,16 @@
+proc means data=&DSTIN. n nmiss mean std min p1 p5 p10 q1 median q3 p90 p95 p99 max maxdec=1;
+class &CLASS. ;
+var &VAR1. ;
+output out=&DSTOUT. N=_N_ NMISS=_NMiss_ MEAN=_MEANS_ STD=_STD_ MIN=_MIN_ P1=_P1_ P5=_P5_ P10=_P10_ Q1=_Q1_ MEDIAN=_MEDIAN_ Q3=_Q3_ P90=_P90_ P95=_P95_ P99=_P99_ MAX=_MAX_;
+run;
+
+/* ------ use 'autoname' to omit write above 'a=_a_' codes, when multiple variables used ------ */
+
+proc means data=&dstin. n nmiss mean std min p1 p5 p10 q1 median q3 p90 p95 p99 max maxdec=1;
+class &class. ;
+var &var1. &var2. ;
+output out=&dstout. n(&var1.)=  nmiss(&var1.)=  mean(&var1.)=  std(&var1.)=  min(&var1.)=  p1(&var1.)=  p5(&var1.)=  p10(&var1.)=  q1(&var1.)=  median(&var1.)=  q3(&var1.)=  p90(&var1.)=  p95(&var1.)=  p99(&var1.)=  max(&var1.)=  
+                    n(&var2.)=  nmiss(&var2.)=  mean(&var2.)=  std(&var2.)=  min(&var2.)=  p1(&var2.)=  p5(&var2.)=  p10(&var2.)=  q1(&var2.)=  median(&var2.)=  q3(&var1.)=  p90(&var1.)=  p95(&var1.)=  p99(&var1.)=  max(&var1.)=  
+                    / autoname ;
+where &whererules. ;
+run;
