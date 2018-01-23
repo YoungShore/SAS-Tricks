@@ -1,0 +1,90 @@
+/* ======= Import JSON Files ======== */
+
+/* ========== codes used for FITBIT data ========== */
+
+%macro import_json2(fileIn,dlm,dstOut);*<--this need to remove the lines of data titles (the first row with column names) to simplify the process;
+
+filename filein "&fileIn."  lrecl=32767 ;
+
+data &dstout.;
+	infile filein recfm=n dlm=&dlm. ;
+	length data $200 ;
+	input data : $200. @@ ; 
+	if strip(data) not in ('"',' ') ;
+run;
+
+%mend;
+%import_json2(&rawFolder.\fitbit_heart_min_20170814_title_removed.txt,"2C5B5D7B7D"x,raw_fitbit2);
+
+
+data fitbit_cl;
+set raw_fitbit2;
+
+N = _n_ ;
+
+length patient_id $10 shim $10 metric $10 timestamp $30 normalized $10 ;
+
+retain j patient_id shim metric timestamp normalized ;
+
+_data = compress(data,'\{}[]');
+
+array vars{*} patient_id shim blk1 metric blk2 timestamp normalized blk3;
+
+if index(_data,'fitbit') then do;
+	j=0;
+	do until(vars(j)='') ;
+		j+1;
+		vars(j) = scan(_data,j,'"');
+	end;
+end;
+
+patient_id=compress(patient_id,'03050A0C0D2009'x);
+*^--pid contains 'enter' marks hidden in string, which cause data cannot match with ids exactly ;
+
+tsDate	= input(substr(timestamp,1,10),yymmdd10.);
+tsTime 	= input(substr(timestamp,12,8),time8.);
+
+data = compress(_data,'"');
+
+format tsDate mmddyy10. tsTime time8. ;
+
+if strip(data)^='"' and index(data,'fitbit')=0;
+
+drop j _data blk1 blk2 blk3 ;
+run;
+
+
+/* ========== 20170818 version: ========== */
+/* if json file has been cleaned a bit and has separated out the IDs, metrics, etc, then use the following codes */
+
+
+%macro import(filein,dlm,dstout);
+filename filein "&filein" lrecl=32767 ;
+PROC IMPORT OUT= &dstout(rename=data=line) 
+            DATAFILE= filein 
+            DBMS=dlm REPLACE;
+     GETNAMES=YES;
+     DATAROW=2; 
+	 DELIMITER="&dlm."X; *<-this is HX ACSII code, use 7B7D as '{}';
+	 GUESSINGROWS=5000;
+RUN;
+%mend;
+%import(&outFolder.\&rawFile,09,dstout);*<--09 stands for using tab as dlm ;
+
+
+
+/* =========== if json file hasn't been grouped by IDs etc, use this version: ========== */
+
+%macro import_json(fileIn,dlm,dstOut);
+
+filename filein2 "&fileIn."  lrecl=32767 ;
+
+data &dstout.;
+	infile filein2 recfm = n dlm=&dlm. dsd/* firstobs=2 dsd truncover*/;
+	length line $200;
+	input line : $200. @@ ;
+	if strip(line) not in ('') ;
+run;
+
+%mend;
+%import_json(&rawFolder.\&rawFile.,"2C7B7D"x,fitbit_raw2);
