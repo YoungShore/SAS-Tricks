@@ -1,0 +1,11 @@
+%let verDate = %sysfunc(today(),yymmdd6.);
+
+%macro mkdir(dir=);
+	* CREATE WORK DIRECTORY FOR OUTPUT IF IT DOES NOT EXIST;
+	%if %sysfunc(fileexist(&outpath)) ^= 1 %then %do;
+		options dlcreatedir;
+		libname out "&outpath.";
+	%end;
+	%else %put &outpath. already exists;
+%mend mkdir;
+%mkdir(dir=&outpath);
