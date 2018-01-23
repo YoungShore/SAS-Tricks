@@ -1,0 +1,19 @@
+/* get the variable name from array names */
+
+array nm(*) all cll oth_ll aml cml oth_ml mono_leuk oth_leuk nhl_nos hodgkin nodnhl mycoses histiocyt hcl letterer mastcell
+			periph_tcell lymphoma_nos otherlymphhisto mm plasma wald head_neck esophagus stomach sm_intest colon rectum
+			anus liver gall pancreas perit digest lung thoracic bone connect malmel female_breast male_breast ks uterus
+			cervix placenta ovary oth_fem prostate testis penis bladder kidney oth_urin eye brain oth_nerv thyroid oth_endo
+			oth_def nmsc 
+			cancer_screen	mammogram	psa	endoscopic_colo	fecal_colo	pap_test	hyperca_comp	spinal_comp	svc_comp
+			dic_comp	pleuref_comp	pain_man_comp	fracture_comp	peg_comp	lymph_biopsy	cpt_chemo	radiation
+			hema_stem_trans
+;
+
+do i=1 to dim(nm);
+	if nm(i)>0 then do;
+		nam=vname(nm(i));
+		disease=strip(scan(put(vname(nm(i)),$cancer.),2,')'));
+		output;
+	end;
+end;
