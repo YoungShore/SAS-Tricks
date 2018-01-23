@@ -1,0 +1,16 @@
+/* check empty data */
+
+proc sql;
+  select memname into :emptydst separated by " "
+	from dictionary.tables
+	  where libname=upcase("yrlib") and memname like upcase("opt2_%")
+	  		and nobs=0 ;
+quit;
+
+/* check data names & var names */
+
+proc sql;
+  select memname, name
+    from dictionary.columns /*<-- noted here it's columns, and above is tables*/
+      where libname=upcase("&libnm") and memname like upcase("&dstnm%");
+quit;      
