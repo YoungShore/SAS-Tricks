@@ -1,0 +1,33 @@
+/* ------ put number in format with leading 0s in macro vars ------ */
+
+%let j = %sysfunc(putn(&i,z2));*<-note z2 is for 2 numbers, and no '.' at end;
+
+/* -------------- create formats -------------- */
+
+data xxformats;
+set rawdata;
+fmtname='xxfmt'; 	*<--this is name your want for format;
+type='C';			*<--if it's a char format, use this, otherwise, omit;
+start=start_value ; *<--start_value is the variable which contains start/exact value you want to format;
+end = end_value ;	*<--if formating a num range, this will be the end of range;
+label=fmt_desc ;	*<--this contains the format text which you want to put on a value ;
+keep fmtname type start end label ;
+run;
+
+proc format cntlin=xxformats;run;
+
+/* ------------- use SAS zip-state data as example ----------- */
+
+data zipstate;
+set sashelp.zipcode;
+fmtname='zipstate';
+type='C';
+start=strip(put(zip,z5.));
+label=statename;
+keep fmtname type start label;
+run;
+proc sort data=zipstate nodup;
+by fmtname start label;
+run;
+
+proc format cntlin=zipstate;run;
