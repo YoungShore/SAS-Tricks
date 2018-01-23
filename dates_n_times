@@ -1,0 +1,26 @@
+%let curDate	 = %sysfunc(today(),date9.);		*<--this generate MMMDDYYYY date;
+%let verDate 	 = 20%sysfunc(today(),yymmdd6.);  	*<--this generate YYYYMMDD date;
+
+/* ===========================================================================
+/* if want to add hours to a time and make the date also change accordingly: 
+   ===========================================================================*/
+
+dateTime = dhms(date,0,0,time) + timeZoneDiff * 3600 ;
+
+/* ========================================================
+/* create time macro variables with system call (easy way) 
+   ========================================================*/
+   
+%let verDate = 20%sysfunc(today(),yymmdd6.);
+
+data _null_; 
+x = input("&verDate",yymmdd8.); 
+call symputx('weekStartDate',put(x-6,mmddyy10.)); 
+call symputx('weekEndDate',put(x,mmddyy10.));
+call symputx('lastVerDate',put(x-7,mmddyy10.));
+run;
+
+%put &weekStartDate ;
+%put &weekEndDate ;
+%put &lastVerDate ;
+
