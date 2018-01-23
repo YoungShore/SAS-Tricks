@@ -1,0 +1,12 @@
+/* ------ add simple or composite index ------ */
+proc datasets library=&wrk. nolist;
+    modify &dstname. ;
+        index create &varname1. ;
+        index create &varname2. ;
+        index create &varname3. ;
+run;quit;
+
+proc datasets library=&wrk. nolist;
+    modify &dstname. ;
+        index create indxcombo=(&varname1. &varname2.) ;
+run;quit;
