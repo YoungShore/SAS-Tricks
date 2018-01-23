@@ -1,0 +1,6 @@
+/* use a number with leading 0s in a macro */
+
+%do i=1 to 5;
+  %let _0_i = %sysfunc(putn(&i,z2)); 
+    *^--note that z2 is 0x, and has no '.' after it, if deal with 3 numbes, use z3, etc;
+%end
