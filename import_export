@@ -1,0 +1,48 @@
+PROC IMPORT OUT= dstin 
+            DATAFILE= "folderpath\importfile.xlsx" 
+            DBMS=EXCEL REPLACE;
+     RANGE="sheet1$"; 
+	 GETNAMES=YES;
+     MIXED=NO;
+     SCANTEXT=YES;
+     USEDATE=YES;
+     SCANTIME=YES;
+RUN;
+
+PROC IMPORT OUT= WORK.pid_geno 
+            DATAFILE= "folderpath\importfile.txt" 
+            DBMS=TAB REPLACE;
+     GETNAMES=YES;
+     DATAROW=2; 
+RUN;
+
+proc import out=rxnorm_c.rxnorm_linked
+			datafile="W:\onenote\references\Drug NDCs\SAS Data\RxNorm\rxcui_table.txt"
+			dbms=dlm replace;
+			delimiter = '|';
+			getnames = yes;
+			datarow = 2 ;
+run;
+
+proc export data=ndc.ndc_anti_hypertensive
+			outfile="W:\onenote\references\Drug NDCs\Files for Sharing\Anti-Hypertensive Meds for Dr.Muntner.txt"
+			dbms=dlm replace;
+			delimiter='|';
+run;
+
+PROC EXPORT DATA= dstout 
+            OUTFILE= "folderpath\exportfile.xlsx" 
+            DBMS=EXCEL REPLACE;
+     SHEET="sheet1"; 
+     NEWFILE=YES;
+RUN;
+
+/* when it's chinese character to output, use below */
+
+filename expot "C:\Users\Sean\Google Drive\DigitHerb\Cleaned Data\reviewed_Fangji_cl.txt" encoding="utf-8";
+
+proc export data=hrb_cl4(keep=name compo compo2 component _quantU)
+			 outfile = expot 
+			 dbms = dlm replace;
+			 delimiter = '|' ;
+run;
