@@ -1,0 +1,64 @@
+/* ====== do loops based on a list of text strings ====== */
+
+/* do a sequential scan of a string */
+
+data aa;
+set bb;
+by id;
+retain i ;
+if first.id then i=0;
+do until(string='') ;
+	i+1;
+	string=scan(raw_string,i,',');
+	if string^='' then output;
+end;
+run;
+
+
+
+
+/* ********************************************* */
+/* when the list is ready from copy/paste, then: */
+/* ********************************************* */
+
+%let EXPOLIST=
+ADALIMUMAB
+ETANERCEPT
+USTEKINUMAB
+INFLIXIMAB
+CERTOLIZUMAB
+GOLIMUMAB
+;
+
+%macro drugexpohash;
+
+%let i=0;
+
+%do %while(%qscan(&EXPOLIST., %eval(&i+1)) ne );
+
+    %let i=%eval(&i+1);
+
+%let drugclass=%scan(&expolist., &i. );
+
+%end;
+%mend;
+
+/* ******************************************** */
+/* when the list should come from a data, then: */
+/* ******************************************** */
+
+proc sql;
+select distinct lowcase(metric) into: acts separated by ' ' from sepa_line; 
+*^--the trick here is "separated by ' '", if don't use it, %qscan won't work ;
+quit;
+
+%macro pull_each_activity;
+%let i=0 ;
+%do %while (%qscan(&acts.,%eval(&i+1)) ne );
+%let i=%eval(&i+1);
+%let act=%scan(&acts.,&i);
+%put &act ;
+%clean_by_activity(&act);
+%end;
+%mend;
+%pull_each_activity;
