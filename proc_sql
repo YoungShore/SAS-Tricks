@@ -1,0 +1,5 @@
+/* ========== add _n_ number in sql steps ========== */
+
+proc sql;
+  select monotonic() as N
+    from xxx ;
