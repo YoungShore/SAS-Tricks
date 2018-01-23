@@ -1,0 +1,18 @@
+/* find only the uppercase letters to compose a abbreviation */
+
+data sites_id_abbr;
+set raw.patient_status(keep=patient_study_id organization);
+length  Site_Abbr $10 ;
+Site_Num	= scan(strip(patient_study_id),1,'-') ; 
+do i=1 to length(organization);
+if 'A'<=substr(scan(organization,1,'('),i,1)<='Z' then Site_Abbr=strip(site_abbr)||substr(organization,i,1);
+end;
+drop i;
+run;
+
+/* find position of a word in a string: findw();
+but 'index' is better, findw will search only whole word match with min options, like cannot recognize 'inject' in 'injection'; but index can.
+*/
+
+findw(var1,'aaa');
+index(var1,'aaa');
