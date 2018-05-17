@@ -1,0 +1,12 @@
+/* if already created a data, but found it's huge and not compressed, use the following codes */
+
+options compress=binary;
+proc datasets lib=temp nolist;
+	copy inlib=origin outlib=temp noclone datecopy memtype=data index=yes constraint=yes;
+	select the_dataset_you_wana_compress ;
+	run;
+	copy inlib=temp outlib=origin noclone datecopy memtype=data index=yes constraint=yes move;
+	select the_dataset_you_wana_compress ;
+	run;
+quit;
+
