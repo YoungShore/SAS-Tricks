@@ -1,0 +1,134 @@
+data a ;
+input id var_a $ ;
+datalines;
+1 a
+1 aa
+2 a
+2 aa
+3 aaa
+;
+run;
+
+data b ;
+input id var_b $ ;
+datalines;
+1 b
+1 bb
+2 b
+2 bb
+2 bbb
+;
+run;
+
+/* ===================== method 1 : merge ===================== */
+/* defect, will join the last of the group (by group) of two data if it's not 1:1 by keywords */
+
+data _tst_ab_mer;
+merge a b ;
+by id ;
+run;
+proc print data=_tst_ab_mer;
+title 'join a & b by merge';
+run;
+
+/* ===================== method 2 : sql ======================== */
+/* no defects found with n:n match, with/out distinct, so far */
+
+proc sql;
+create table _tst_ab_sql_distinct as
+select distinct a.*, b.*
+from a as a
+left join b as b
+on a.id=b.id;
+quit;
+proc print data=_tst_ab_sql_distinct;
+title 'join a & b by sql with distinct option';
+run;
+
+proc sql;
+create table _tst_ab_sql_nondist as
+select a.*, b.*
+from a as a
+left join b as b
+on a.id=b.id;
+quit;
+proc print data=_tst_ab_sql_nondist;
+title 'join a & b by sql without distinct option';
+run;
+
+/* ====================== method 3 : hash without multidata option ===================== */
+/* if without multidata option and use it with non-unique data, will keep the first obs from main body (non-key-defined data) */
+
+data _tst_ab_hash_s ;
+if _n_=1 then do;
+  declare hash ha(dataset:'a',ordered:'a');
+  ha.definekey('id');
+  ha.definedata('id','var_a');
+  ha.definedone();
+end;
+if 0 then set a ;
+set b ;
+rc=ha.find();
+if rc^=0 then do;
+	find=0;
+	output;
+end;
+else do;
+	find=1;
+	output;
+end;
+run;
+
+/* ====================== method 3 : hash with multidata option ===================== */
+/* the below 2 paragraph switched key-defined dataset, the results are different:
+  the hash process will use the key-defined data as a repository of 'keywords', then search in the non-key-defined data,
+  if found, then keep or apply some algorithm like set enc_type='ot', for example.
+  an extra paragraph from real standardization process are pasted for more digesting info.
+  
+data _tst_ab_hash_m ;
+if _n_=1 then do;
+  declare hash ha(dataset:'a',ordered:'a',multidata:'y');
+  ha.definekey('id');
+  ha.definedata('id','var_a');
+  ha.definedone();
+end;
+if 0 then set a ;
+set b ;
+rc=ha.find();
+if rc^=0 then do;
+	find=0;
+	output;
+end;
+do while(rc=0);
+	find=1;
+	output;
+	rc=ha.find_next();
+end;
+run;
+proc print data=_tst_ab_hash_m;
+title 'join a & b by hash multiple';
+run;
+
+data _tst_ab_hash_m_b ;
+if _n_=1 then do;
+  declare hash ha(dataset:'b',ordered:'a',multidata:'y');
+  ha.definekey('id');
+  ha.definedata('id','var_b');
+  ha.definedone();
+end;
+if 0 then set b ;
+set a ;
+rc=ha.find();
+if rc^=0 then do;
+	find=0;
+	output;
+end;
+else do while(rc=0);
+	find=1;
+	output;
+	rc=ha.find_next();
+end;
+run;
+proc print data=_tst_ab_hash_m_b;
+title 'join a & b by hash multiple & use b as declared hash';
+run;
