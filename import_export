@@ -9,6 +9,15 @@ PROC IMPORT OUT= dstin
      SCANTIME=YES;
 RUN;
 
+PROC IMPORT OUT= WORK.link_Ndc_rxcui 
+            DATATABLE= "REVDEL0_EXT_VOCAB_LINK" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="...\Microsoft Access Database\MedKnowledgeSampleDatabase.accdb"; 
+     SCANMEMO=YES;
+     USEDATE=NO;
+     SCANTIME=YES;
+RUN;
+
 PROC IMPORT OUT= WORK.pid_geno 
             DATAFILE= "folderpath\importfile.txt" 
             DBMS=TAB REPLACE;
