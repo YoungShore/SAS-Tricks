@@ -1,0 +1,12 @@
+
+/* this is creating table with particular separator */
+
+data gout_response ;
+infile datalines delimiter="," ;
+input question_id $ response_id $ response_text $ ;
+datalines;
+58,494,Yes
+58,511,No
+59,604,0
+;
+run;
