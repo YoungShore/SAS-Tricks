@@ -1,0 +1,14 @@
+/* to generate one vbar inside of another vbar and show % of the smaller one */
+
+ods graphics / imagename="Diff HAQ Results on Same Day by Short PracticeID" width=3in width=900px ;
+proc sgplot data=&wrk..ris_haq_dups_prac_pcnt ;
+	*styleattrs datacolors=(%rgbhex(140,185,202) %rgbhex(19,85,137)) ;
+	vbar pracID_Seq / response=All_PsnDay_Count  ;
+	vbar pracID_Seq / response=Dups_PsnDay_Count datalabel=Dups_PsnDay_Percent datalabelfitpolicy=rotate barwidth=0.5 ;
+	keylegend / location=outside position=topright noborder valueattrs=(size=5) ;
+	xaxis fitpolicy=thin display=(nolabel noticks) valueattrs=(size=6 color=gray) discreteorder=data ;
+	yaxis grid display=(noline noticks nolabel) valueattrs=(size=6 color=gray) ;
+	title "Percent of Suspicious Same Day Different HAQ Values by PracticeID";
+	footnote "Ordered by Descending of Absolute Dups_PsnDay_Count Value";
+run;
+title;footnote;
