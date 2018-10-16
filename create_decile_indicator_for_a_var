@@ -1,0 +1,8 @@
+
+/* create an indicator for a variable for it's decile group */
+
+proc rank data=&dstin groups=10 /*descending*/ out=&dstout. ; /*<--- if use descending options then the first decile cover the hightest value */
+by group_you_need ;
+var var_to_split ;
+ranks var_name_of_decile ;
+run;
