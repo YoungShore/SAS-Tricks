@@ -87,7 +87,7 @@ run;
   
 data _tst_ab_hash_m ;
 if _n_=1 then do;
-  declare hash ha(dataset:'a',ordered:'a',multidata:'y');
+  declare hash ha(dataset:'a',ordered:'a',multidata:'y'); /*<-- ordered:'a' & multidata:'y' are default settings that will sort data in ascending & multidata=yes */
   ha.definekey('id');
   ha.definedata('id','var_a');
   ha.definedone();
