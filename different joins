@@ -87,13 +87,13 @@ run;
   
 data _tst_ab_hash_m ;
 if _n_=1 then do;
-  declare hash ha(dataset:'a',ordered:'a',multidata:'y'); /*<-- ordered:'a' & multidata:'y' are default settings that will sort data in ascending & multidata=yes */
-  ha.definekey('id');
-  ha.definedata('id','var_a');
+  declare hash ha(dataset:'a',ordered:'a',multidata:'y'); 	/*<-- ordered:'a' & multidata:'y' are default settings that will sort data in ascending & multidata=yes */
+  ha.definekey('id');					  					/*<-- defines the key variables to link */
+  ha.definedata('id','var_a');				  				/*<-- defines the variables to keep from the key-data */
   ha.definedone();
 end;
-if 0 then set a ;
-set b ;
+if 0 then set a ;			/*<--- set in the key data */
+set b ;						/*<--- set in the non-key-data, which should be searched in */
 rc=ha.find();
 if rc^=0 then do;
 	find=0;
