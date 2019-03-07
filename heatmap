@@ -1,0 +1,64 @@
+/* this is trying to create a heatmap for tracking of person-day level activity, like each person each day, how many calories burned.
+  red('hot active') means consumes a lot; blue('cold static') means consumes less .
+*/
+/* before running below steps, prepare the data into each ID on each day, has a unique row of observations, like calories, water_oz, etc.
+   and the template is actually the core of designing the heatmap. the proc sgrender is just one line of code to run the pic out.
+*/
+
+proc template;
+  define statgraph fitHeat;
+	begingraph / designheight=4000px
+	  			     designwidth =2000px ;
+		entrytitle "can put your study titles here for the chart";
+		*entrytitle "some extra title contents put here";
+
+		layout overlay / yaxisopts=(/*discreteopts=(tickvaluefitpolicy=none) 
+									display=(tickvalues)*/ reverse=true
+									offsetmin=0.01 offsetmax=0.01 
+									linearopts=(thresholdmin=1 thresholdmax=1) )
+						      /*xaxisopts=( discreteopts=(tickvaluefitpolicy=rotate)
+									display=(tickvalues)
+									offsetmin=0.01 offsetmax=0.01)*/;
+
+			* Heat map provides the background color for each cell ; * this chart make days as y-axis & each people as x-axis ;
+      
+			heatmapparm y = &put_days_since_0    x = &put_your_people_id    colorresponse = &put_your_variable_need_plot_for_each_ID_each_day 
+						/ ColorModel=(lightblue lightgray darkred) name="&giveAnameToThisLayerOfHeatmap" 
+							fillattrs=(transparency=0.3) ;
+	    		    continuouslegend "&giveAnameToThisLayerOfHeatmap" / location=outside valign=top;*bottom;*halign=right;
+
+			* Heat map provides the outlines ; 
+      
+			heatmapparm y = &put_days_since_0    x = &put_your_people_id  colorresponse = &put_another_variable_need_plot_for_each_ID_each_day 
+						/ 	/*ColorModel=(purple)*/
+							display=all includemissingcolor=false fillattrs=(transparency=0.9)
+							outlineattrs=graphdata3(thickness=5); *<-- this particular heatmap step will circle out person-day square met particular criterion;
+
+			* Textplot provides the values ;
+      
+			textplot y = &put_days_since_0     x = &put_your_people_id    text = eval(put(&put_your_variable_need_plot_for_each_ID_each_day, best4.)) /
+					 textattrs=(size=20px) position=top;  *^---the texts is added to the first heatmap accordingly;
+			textplot y = &put_days_since_0     x = &put_your_people_id    text = &var_value_needto_add_to_each_block /
+					 textattrs=(size=20px) position=bottom;
+		endlayout;
+/*					* Add a small square;
+			if (Days_Missing_Daily_Consecutively >= 3 or Days_PastDue_Wekly_Consecutively >=3 )
+				layout overlay / yaxisopts=(display=none)
+                                xaxisopts=(display=(label));
+					scatterplot y=days_since_enrolled x=patient_id /
+					markerattrs=graphdata3(symbol=squarefilled size=12 transparency=0.3 color=yellow)
+					discreteoffset=-0.3 ;
+				endlayout;
+			endif ;
+*/
+			/* Add text to the square;
+			scatterplot y=RowLab x=ColLab / markercharacter=eval(put(entry, 3.))
+			discreteoffset=0.35; */
+	endgraph;
+  end;
+quit;
+
+ods listing gpath="&outpath.\&outfolder.";
+ods graphics / reset width=2000px height=4000px scale=on imagename="&verDate._SmartWatch_Pernson_Daily_Heatmap"; 
+proc sgrender data=fit_heatmap_&ver. template=fitHeat;
+run;
