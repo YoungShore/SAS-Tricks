@@ -1,0 +1,81 @@
+/* PROC REPORT tricks: */
+
+/* ========== general structure ========== */
+
+proc report data = &dstin. ;
+  columns v1 v2 v3... ;
+    define v1 / display "can put your label in these double quotes" width = 30 ;
+    define v2 / display "can put your label in these double quotes" width = 15 ;
+    ...
+    compute v1 ;
+    ...
+    endcomp ;
+run ;
+
+
+/* ====================================================== */
+/*            make indent of a column (or row)            */
+/* ====================================================== */
+
+* ... general parts ... ;
+
+    compute variable_you_need_to_make_indent ;
+      if some_condition_met then do;
+        call define(_col_,'style','style={indent=20}') ;
+      end;
+    endcomp;
+    
+ * ... other steps ... ;
+ 
+ 
+ 
+/* ========================================================== */
+/*            make color altered by rows or groups            */
+/* ========================================================== */
+
+/* if you want to alter color every other row, then use the trick of mod(count,2) */
+
+* ... general parts ... ;
+
+    compute the_var_you_want_to_alter_color ;
+      if mod(count,2) then do;
+        call define(_row_,'style','style=[background=lightblue]') ;
+      end;
+      count + 1 ; *<--- if put 'count + 1' above if condition, then the first count will be 1 and will be colored with blue. ;
+                  *^--- put it below the 'end', can adapt group settings if you want to alter color by several rows in a group (without adding too many steps of preparation) ;
+    endcomp ;
+    
+* ... other steps ... ;    
+
+/* if you want to alter color by a group of rows, with neat pattern, like all by every other 5 rows, (not first 3 rows then 4 rows),
+    use the trick of "mod(int(count/&n.),2)", where macro &n is the number of rows you want to alter color
+*/
+
+    compute the_var_you_want_to_alter_color ;
+      if mod(int(count/5),2) then do;         *<--- this will alter color every 5 rows ;
+        call define(_row_,'style','style=[background=lightblue]') ;
+      end;
+      count + 1 ;     *<--- only when use 'count+1' after if-condition will fulfill the needs of every other 5 rows by use 'int' way. ;
+                      *^--- if use 'count+1' above if, the 5th row, which supposed be the same color with 4th row, but will start changing color ;
+    endcomp;
+
+/* ======================================================================== */
+/*              define cell color based on particular condition             */
+/* espacially on compound conditions                                        */
+/* colors will be kept on first_given_first_save, means earlier set color 
+    will block later definitions                                            */
+/* ======================================================================== */
+
+      compute the_variable_you_want_to_color ;
+        if hierrarchy = 1 then do ;
+          call define(_col_,'style','style={background=cx3f2a14(your color) fontweight=bold color=yellow}') ;
+          *... other steps ...;
+        end;
+        if hierarchy = 2 then do ;
+          call define(_col_,'style','style={...}') ;
+        end ;
+        ...
+      endcomp ;
+      
+      
+        
