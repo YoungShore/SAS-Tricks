@@ -1,0 +1,77 @@
+
+/* ====================== method 3 : hash without multidata option ===================== */
+/* if without multidata option and use it with non-unique data, will keep the first obs from main body (non-key-defined data) */
+
+data _tst_ab_hash_s ;
+if _n_=1 then do;
+  declare hash ha(dataset:'a',ordered:'a');
+  ha.definekey('id');
+  ha.definedata('id','var_a');
+  ha.definedone();
+end;
+if 0 then set a ;
+set b ;
+rc=ha.find();
+if rc^=0 then do;
+	find=0;
+	output;
+end;
+else do;
+	find=1;
+	output;
+end;
+run;
+
+/* ====================== method 3 : hash with multidata option ===================== */
+/* the below 2 paragraph switched key-defined dataset, the results are different:
+  the hash process will use the key-defined data as a repository of 'keywords', then search in the non-key-defined data,
+  if found, then keep or apply some algorithm like set enc_type='ot', for example.
+  an extra paragraph from real standardization process are pasted for more digesting info.
+  
+data _tst_ab_hash_m ;
+if _n_=1 then do;
+  declare hash ha(dataset:'a',ordered:'a',multidata:'y'); 	/*<-- ordered:'a' & multidata:'y' are default settings that will sort data in ascending & multidata=yes */
+  ha.definekey('id');					  					/*<-- defines the key variables to link */
+  ha.definedata('id','var_a');				  				/*<-- defines the variables to keep from the key-data */
+  ha.definedone();
+end;
+if 0 then set a ;			/*<--- set in the key data */
+set b ;						/*<--- set in the non-key-data, which should be searched in */
+rc=ha.find();
+if rc^=0 then do;
+	find=0;
+	output;
+end;
+do while(rc=0);
+	find=1;
+	output;
+	rc=ha.find_next();
+end;
+run;
+proc print data=_tst_ab_hash_m;
+title 'join a & b by hash multiple';
+run;
+
+data _tst_ab_hash_m_b ;
+if _n_=1 then do;
+  declare hash ha(dataset:'b',ordered:'a',multidata:'y');
+  ha.definekey('id');
+  ha.definedata('id','var_b');
+  ha.definedone();
+end;
+if 0 then set b ;
+set a ;
+rc=ha.find();
+if rc^=0 then do;
+	find=0;
+	output;
+end;
+else do while(rc=0);
+	find=1;
+	output;
+	rc=ha.find_next();
+end;
+run;
+proc print data=_tst_ab_hash_m_b;
+title 'join a & b by hash multiple & use b as declared hash';
+run;
