@@ -1,3 +1,8 @@
+/* use xlsx engine to import excel file, to avoid any 64bit/32bit compatible issue */
+
+LIBNAME d_nam XLSX "&folderPath.\&inFile.xlsx" ; 
+/* ^-- note that the library created for One xlsx file, not the whole folder stored the excel files, then use "data aa; set bb;" step to quote the sheet you needed*/
+
 PROC IMPORT OUT= dstin 
             DATAFILE= "folderpath\importfile.xlsx" 
             DBMS=EXCEL REPLACE;
