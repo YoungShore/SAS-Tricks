@@ -51,6 +51,14 @@ PROC EXPORT DATA= dstout
      NEWFILE=YES;
 RUN;
 
+/* use xlsx engine/library to output Excel file: */
+
+libname xl_out "&outpath.\&out_file_name..xlsx" ; *<--note that this define the exact Excel file name, if not exist, it will create one excel file for you, under that name;
+
+data xl_out.sheet1 ; *<-- note that sheet1 is the sheet name assigned to the output file ;
+set &cleaned_data. ;*<-- this is the data in SAS that you want to output to xlsx ;
+run;
+
 /* when it's chinese character to output, use below */
 
 filename expot "C:\Users\Sean\Google Drive\DigitHerb\Cleaned Data\reviewed_Fangji_cl.txt" encoding="utf-8";
