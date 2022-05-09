@@ -1,0 +1,22 @@
+/*  this is a quick example of proc power, for proportion designs */
+
+
+proc power; 
+  onesamplefreq  test=z method = normal
+  sides = 2
+  alpha = 0.05
+  nullproportion = 0.5
+  proportion = 0.62
+  ntotal = . 
+  power = 0.82 ; 
+run;
+
+/*  this is a quick example of sequential designs */
+
+proc seqdesign boundaryscale=SCORE altref = -0.40547;
+TwoSidedOBF_Lan: design nstages=2 alpha=0.05
+beta=.2 method=errfuncOBF info=cum(85 198)
+stop=both (betaboundary=nonbinding);
+ods output Boundary=BoundS;
+run;
+
