@@ -1,3 +1,8 @@
+/* ====== get all datasets / variables names and etc ====== */
+
+proc datasets lib=&yourLibname. memtype=data noprint;
+	contents data=_all_ out=work.&outputDataset ; *<--use work. as output library, or it will write to the same library as &yourLibname ;
+quit;run;
 
 /* ====== check datasets names in a library ====== */
 
