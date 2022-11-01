@@ -1,6 +1,8 @@
 /* to convert mmddyy hh:mm:ss AM|PM +|-hh:mm type of datetime, such as 01/01/22 01:01:01 AM -04:00 */
 
 %macro dtm_zone_convrt(dtmIn,dtmOut);
+	/* since UTC + 2:00 for example, is a local time 2 hours ahead of UTC, which means if itis time from UTC +2:00, 
+		then the UTC time should = local time - 2 hours if convert every time to UTC (+00:00)	*/
 	if index(&dtmIn.,'+')	then &dtmOut. = input(substr(&dtmIn.,1,20),mdyampm25.) + input(scan(scan(&dtmIn.,2,'+'),1,':'),best.)*3600;
 							else &dtmOut. = input(substr(&dtmIn.,1,20),mdyampm25.) - input(scan(scan(&dtmIn.,2,'-'),1,':'),best.)*3600;
 	format &dtmOut. mdyampm25.;
