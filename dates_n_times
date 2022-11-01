@@ -1,3 +1,13 @@
+/* to convert mmddyy hh:mm:ss AM|PM +|-hh:mm type of datetime, such as 01/01/22 01:01:01 AM -04:00 */
+
+%macro dtm_zone_convrt(dtmIn,dtmOut);
+	if index(&dtmIn.,'+')	then &dtmOut. = input(substr(&dtmIn.,1,20),mdyampm25.) + input(scan(scan(&dtmIn.,2,'+'),1,':'),best.)*3600;
+							else &dtmOut. = input(substr(&dtmIn.,1,20),mdyampm25.) - input(scan(scan(&dtmIn.,2,'-'),1,':'),best.)*3600;
+	format &dtmOut. mdyampm25.;
+%mend;
+
+/* ====== get system function  ====== */
+
 %let curDate	 = %sysfunc(today(),date9.);		*<--this generate MMMDDYYYY date;
 %let verDate 	 = 20%sysfunc(today(),yymmdd6.);  	*<--this generate YYYYMMDD date;
 
