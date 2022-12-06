@@ -14,6 +14,21 @@ PROC IMPORT OUT= dstin
      SCANTIME=YES;
 RUN;
 
+/* if want to specify the starting row of an xlsx file, use below: */
+
+PROC IMPORT OUT= dstin 
+            DATAFILE= "folderpath\importfile.xlsx" 
+            DBMS=EXCEL REPLACE;
+     RANGE="sheet1$A3:0"; *<--A3 defines the read-in range starts from column A row 3;
+	 GETNAMES=YES;
+/*   MIXED=NO;
+     SCANTEXT=YES;
+     USEDATE=YES;
+     SCANTIME=YES;
+     ^--but above 4 options cannot be used at the same time
+*/
+RUN;
+
 PROC IMPORT OUT= WORK.link_Ndc_rxcui 
             DATATABLE= "REVDEL0_EXT_VOCAB_LINK" 
             DBMS=ACCESS REPLACE;
