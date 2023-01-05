@@ -6,6 +6,26 @@ run;
 
 /* ------ use 'autoname' to omit write above 'a=_a_' codes, when multiple variables used ------ */
 
+/*  --- a simple macro to get means from ONE variable --- */
+
+%macro out_means(dsIn,clas,var,dsOut);*only for one numerical var;
+
+  proc means data=&dsIn. n nmiss mean std maxdec=1;
+    class &clas. ;
+    var &var. ;
+    output out=&dsOut. 	n(&var.)=n_&var. 			nmiss(&var.)=nmiss_&var. 
+              mean(&var.)=mean_&var. 		std(&var.)=std_&var. 
+              min(&var.)=min_&var.		max(&var.)=max_&var.
+              median(&var.)=median_&var.	q1(&var.)=q1_&var. 		q3(&var.)=q3_&var.
+              p1(&var.)=p1_&var. 			p5(&var.)=p5_&var. 		p10(&var.)=p10_&var.
+              p90(&var.)=p90_&var.		p95(&var.)=p95_&var.	p99(&var.)=p99_&var.
+              / autoname;
+  run;
+
+%mend;
+
+/*  --- if need >1 variable in one step: ---  */
+
 proc means data=&dstin. n nmiss mean std min p1 p5 p10 q1 median q3 p90 p95 p99 max maxdec=1;
 class &class. ;
 var &var1. &var2. ;
