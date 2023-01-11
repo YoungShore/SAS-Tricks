@@ -1,5 +1,46 @@
 /* PROC REPORT tricks: */
 
+/* ========== to break table into multiple pages and have footnotes on each end of page: ========== */
+   * ------ 1st, add a group varialbe in the final table want to print ------ ;
+   	Data &pgmname.;
+		Set &dsIn.;
+		N_ = _N_;
+		GROUP = int(N_/15);	*<--add this grouping var to have page break by and then footnote can repeatedly shown on each page. eg set 15 rows per page here;
+		Retain Flag 1 ;
+		Run;
+    
+    * ------ then when set proc report, use grp as a group variable, but not printed, for page break, and then footnote will be put at end of each page, too ;
+    
+    ods listing close;
+    options orientation=landscape;
+    ods escapechar = "^";
+    option nodate nonumber missing= "" nobyline;
+    ods rtf file = "&outPath.\&pgmName..doc" /*style = journal custom*/ bodytitle /*<--will have titles out of header*/;
+
+    title Justify=c c=black height=10pt bold "your title";
+
+    proc report data=&pgmName. split="^" headline missing nowd center; 
+      columns ("LABEL1" VAR1)
+              ("LABEL2" VAR2 VAR3)
+              ("LABEL3" VAR4 VAR5)
+              FLAG GROUP ; 
+      define VAR1		/ "VARLABEL1"			style(header column) = {just = l cellwidth = 1.5in};
+      define VAR2		/ "VARLABEL2"			style(header column) = {just = c cellwidth = 0.4in };
+
+      define FLAG / order noprint;
+      define GROUP / order noprint;		break after GROUP/page; *<--this break setting will break table by GROUP variable into multiple pages;
+
+      compute after _page_ / style=header{background=white font_size=8pt font_weight=medium just=l};
+        line "first footenote";
+        line "second footnote";
+        %footer;
+      endcomp;
+    quit;run; 
+    ods rtf close;
+    title;
+
+
+
 /* ========== general structure ========== */
 
 proc report data = &dstin. ;
