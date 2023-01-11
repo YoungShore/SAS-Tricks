@@ -1,3 +1,20 @@
+/* ========== check whether something wrong and give error warning ========== */
+
+	Proc SQL;
+		*** Make sure no Ss have >1 score per visit;
+		Select Subnum, visname
+			From raw.NIHSS
+			Group BY Subnum, visname
+			Having Count(*) NE 1;
+		%If &sqlOBS^=0
+			%Then %Do;
+				%Put;
+				%Put ERROR: There is a subject with more than one score for a visit. See listing file for details;
+				%Put;
+				%Return;
+				%End;
+
+
 /* ========== add _n_ number in sql steps ========== */
 
 proc sql;
