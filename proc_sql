@@ -1,3 +1,21 @@
+/* ========== if need to use a macro variable which contais >1 vars in group by then try below lines ========= */
+
+%macro pul_dups(dsIn	/*input dataset*/,
+		grpVars /*variables need to be use in group function. list them with blank separated*/);
+
+	%let grpBy = %sysfunc(tranwrd(%sysfunc(compbl(&grpVars.)),%str( ),%str(,))); *this step will replace the blanks between variables with comma, so to fit for group function in SQL;
+
+	proc sql; 
+	create table _dups_&dsIn. as
+	select *
+	from raw.&dsIn.
+	group by &grpBy. 
+	having count(&id_sub.)>1 ;
+	quit;
+%mend;
+%pul_dups(ds1,var1 var2);
+
+
 /* ========== check whether something wrong and give error warning ========== */
 
 	Proc SQL;
